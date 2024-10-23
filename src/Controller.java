@@ -1,3 +1,5 @@
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Kontroller: 
  * Styrer og samkjører spillbrettet (GoLModell) og brukergrensesnitt (GoLGUI)
@@ -14,6 +16,7 @@ public class Controller {
     int antKol;
     long delay;
     UpdateThread updateLoop;
+    CountDownLatch rowCount;
 
     boolean running = false;
 
@@ -74,26 +77,52 @@ public class Controller {
         this.oppdaterGUI();
     }
 
-    // metode for å oppdatere rutenett TODO make more efficient?
+    // metode for å oppdatere rutenett
     public void oppdatering(){
+        this.rowCount = new CountDownLatch(antRad);
+        
         // løkke for å oppdatere antall levende naboer
         for (int rad = 0; rad < this.antRad; rad++){ // itererer over alle rader
-            for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
-                // henter celle fra gjeldende posisjon
-                Cell celle = this.rutenett.hentCelle(rad, kol);
+            int r = rad;
+            
+            Thread t = new Thread(() -> {
+                for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
+                    // henter celle fra gjeldende posisjon
+                    Cell celle = this.rutenett.hentCelle(r, kol);
+    
+                    celle.tellLevendeNaboer();
+                }
+                rowCount.countDown();
 
-                celle.tellLevendeNaboer();
-            }
+            });
+
+            t.start();
         }
+
+        try{ rowCount.await(); } catch(InterruptedException e){}
+
+        this.rowCount = new CountDownLatch(antRad);
+
         // løkke for å oppdatere status
         for (int rad = 0; rad < this.antRad; rad++){ // itererer over alle rader
-            for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
-                // henter celle fra gjeldende posisjon
-                Cell celle = this.rutenett.hentCelle(rad, kol);
+            int r = rad;
 
-                celle.oppdaterStatus();
-            }
+            Thread t = new Thread(() -> {
+                for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
+                    // henter celle fra gjeldende posisjon
+                    Cell celle = this.rutenett.hentCelle(r, kol);
+
+                    celle.oppdaterStatus();
+                }
+                rowCount.countDown();
+
+            });
+
+            t.start();
         }
+        
+        try{ rowCount.await(); } catch(InterruptedException e){}
+
         // inkrementerer generasjonsnummer
         this.genNr++;
 
@@ -105,7 +134,7 @@ public class Controller {
         this.gui.init(this, antRad, antKol);
     }
 
-    public void settings(){ // dimensions of grid, update frequency , ...?
+    public void settings(){ // dimensions of grid, update freq , ...?
         // TODO implement settings prompt
     }
 

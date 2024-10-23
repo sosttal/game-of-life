@@ -23,13 +23,13 @@ public class View {
     
     //  menubar elements
     //      lables:
-    JLabel amtPreambleLabel;    // "Alive cells: "
+    JLabel aliveCells;    // "Alive cells: "
     JLabel amtLabel;            // for living counter
 
     //      buttons:
     JButton startStopBtn;   // to start/stop update loop
     JButton exitBtn;        // to exit program
-    JButton resetBtn;       // to reset game-grid (new 0th generation)
+    JButton regenBtn;       // to reset game-grid (new 0th generation)
     JButton clearBtn;       // to clear game-grid (sets all cells to dead)
 
     JButton[][] cellBtns;
@@ -92,7 +92,7 @@ public class View {
     }
 
     // for reset button: kills all cells and regens new 0th gen
-    class Reset implements ActionListener{
+    class Regen implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
             // clear();
@@ -174,22 +174,22 @@ public class View {
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // oppretter og legger til elementer i menyknapp-panelet
-        this.amtPreambleLabel = new JLabel("Alive cells: ");
-        this.amtLabel = new JLabel(" ");
-        this.amtPreambleLabel.setForeground(Color.WHITE);
+        this.aliveCells = new JLabel("Alive cells: "); 
+        this.amtLabel = new JLabel();
+        this.aliveCells.setForeground(Color.WHITE);
         this.startStopBtn = new JButton("Start");
         this.amtLabel.setForeground(Color.WHITE);
         this.startStopBtn.addActionListener(new StartStop());
-        this.resetBtn = new JButton("Reset");
-        this.resetBtn.addActionListener(new Reset());
+        this.regenBtn = new JButton("Regen");
+        this.regenBtn.addActionListener(new Regen());
         this.clearBtn = new JButton("Clear");
         this.clearBtn.addActionListener(new Clear());
         this.exitBtn = new JButton("Exit");
         this.exitBtn.addActionListener(new Exit());
-        this.menuBar.add(this.amtPreambleLabel);
+        this.menuBar.add(this.aliveCells);
         this.menuBar.add(this.amtLabel);
         this.menuBar.add(this.startStopBtn);
-        this.menuBar.add(this.resetBtn);
+        this.menuBar.add(this.regenBtn);
         this.menuBar.add(this.clearBtn);
         this.menuBar.add(this.exitBtn);
         
