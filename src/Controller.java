@@ -1,26 +1,27 @@
-/** IN1010 V24: Innlevering 5
- * @author sondrta
- * 
+/**
  * Kontroller: 
  * Styrer og samkjører spillbrettet (GoLModell) og brukergrensesnitt (GoLGUI)
  * Funksjonalitet for å oppdatere verden til neste generasjon, dvs endre status på alle celler i henhold til spillregler
+ * 
+ * @author Sondre S Talleraas
  */
-
 public class Controller {
     // fields
     Model rutenett;
     int genNr;
     int antRad;
     int antKol;
+    long delay;
     View gui;
 
     boolean signal;
 
     // konstruktør
-    public Controller(int antRad, int antKol){
+    public Controller(int antRad, int antKol, long delay){
         // initierer instansvariabler
         this.antRad = antRad;
         this.antKol = antKol;
+        this.delay = delay;
         this.rutenett = new Model(antRad, antKol);
         this.genNr = 0;
         gui = new View();
@@ -60,8 +61,16 @@ public class Controller {
     public void settLevende(int rad, int kol){
         rutenett.settLevende(rad, kol);
     }
+
     public void settDoed(int rad, int kol){
         rutenett.settDoed(rad, kol);
+    }
+
+    // TODO:(test/implement) metode for å generere ny førstegen(0te)
+    public void regenererCeller(){
+        this.rutenett.fyllMedTilfeldigeCeller();
+        this.rutenett.kobleAlleCeller();
+        this.oppdaterGUI();
     }
 
     // metode for å oppdatere rutenett
@@ -108,16 +117,22 @@ public class Controller {
 
     // metode for å avgjøre når oppdaterings-løkke skal starte
     public void sjekkStart(){
-        // pause settes til 2000ms (2s)
-        long delay = 2000;
 
         // oppdaterings-løkke
         while (signal){
             this.oppdatering();
             try{
-                Thread.sleep(delay);
+                Thread.sleep(this.delay);
             } catch(Exception e){
                 return;
+            }
+        }
+    }
+
+    public void killAll(){
+        for (int rad = 0; rad < this.antRad; rad++){ // itererer over alle rader
+            for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
+                this.rutenett.settDoed(rad, kol);
             }
         }
     }

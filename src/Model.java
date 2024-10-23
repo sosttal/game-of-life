@@ -1,10 +1,9 @@
-/** IN1010 V24: Innlevering 5
- * @author sondrta
- * 
+/**
  * GoLModell-klasse:
  * Representerer rutenettet som utgjør spillbrettet
+ * 
+ * @author Sondre S Talleraas
  */
-
 public class Model {
     // felter
     int antRader;

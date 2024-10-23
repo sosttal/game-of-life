@@ -1,10 +1,10 @@
-/** IN1010 V24: Innlevering 5
- * @author sondrta
+/**
+ * Cell-class to be used by the game grid ({@link #Model}).
  * 
- * GoLCelle-klasse:
- * Representerer celler i rutenettet
+ * <p> Represents individual Cell-objects
+ * 
+ * @author Sondre S Talleraas
  */
-
 public class Cell {
     // felter (ikke satt til private for å unngå problemer med tester)
     boolean levende;
