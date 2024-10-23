@@ -23,36 +23,37 @@ public class View {
     
     //  menubar elements
     //      lables:
-    JLabel amtLivingLabel;  // for displaytext
-    JLabel amtLabel;        // for living counter
-    String amtLivingTxt;    // displaytext 
-    int amtLiving = 0;      // living counter (amount of alive cells)
+    JLabel amtPreambleLabel;    // "Alive cells: "
+    JLabel amtLabel;            // for living counter
+
     //      buttons:
     JButton startStopBtn;   // to start/stop update loop
     JButton exitBtn;        // to exit program
     JButton resetBtn;       // to reset game-grid (new 0th generation)
     JButton clearBtn;       // to clear game-grid (sets all cells to dead)
 
-    JButton[][] celleknapper;
+    JButton[][] cellBtns;
     boolean[][] celleStatus; // for å lagre status på celler (true hvis levende)
     boolean start = false; // for å holde styr på om start-/stoppknapp skal starte eller stoppe. initieres til false siden programmet ikke skal starte før knapp trykkes en gang
 
     //ActionListeners:
     // start-/stoppknapp: veksler mellom å starte og stoppe programmet og oppdaterer knappetekst
-    class StartStopp implements ActionListener{
+    class StartStop implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            if (!start){ 
+            if (!start){ // TODO check (implement) boolean Controller.start()? alt name: Controller.running()
                 start = true;
-                // oppdaterer knappetekst
+                // update button text
                 startStopBtn.setText("Stop");
+
                 // sender startsignal til kontroller
                 CTRL.startsignal(true);
                 
             } else{
                 start = false;
-                // oppdaterer knappetekst
+                // update button text
                 startStopBtn.setText("Start");
+
                 // sender stoppsignal til kontroller
                 CTRL.startsignal(false);
             }
@@ -60,7 +61,7 @@ public class View {
     }
 
     // avslutte-knapp: avslutter programmet
-    class Avslutt implements ActionListener{
+    class Exit implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
             System.exit(0);
@@ -68,24 +69,24 @@ public class View {
     }
 
     // celleknapp: endrer status på celle som blir trykket på
-    class EndreStatus implements ActionListener{
+    class FlipStatus implements ActionListener{
         // felter
-        int rad;
-        int kol;
+        int row;
+        int col;
 
         // konstruktør tar posisjon til rute (rad, kol) som arg, for å kunne finne riktig knappe- og celleobjekt
-        public EndreStatus(int rad, int kol){
-            this.rad = rad;
-            this.kol = kol;
+        public FlipStatus(int r, int c){
+            this.row = r;
+            this.col = c;
         }
         
         @Override
         public void actionPerformed(ActionEvent e){
             // sjekker status og kaller relevant metode
-            if (!celleStatus[rad][kol]){
-                settLevende(rad,kol);
+            if (!celleStatus[row][col]){
+                settLevende(row,col);
             } else{
-                settDoed(rad,kol);
+                settDoed(row,col);
             }
             // oppdaterer gui
             CTRL.oppdaterGUI();
@@ -114,8 +115,8 @@ public class View {
         // sett til levende
         CTRL.settLevende(rad, kol);
         celleStatus[rad][kol] = true;
-        celleknapper[rad][kol].setText("*");
-        celleknapper[rad][kol].setBackground(Color.GREEN);
+        cellBtns[rad][kol].setText("*");
+        cellBtns[rad][kol].setBackground(Color.GREEN);
         
         CTRL.settLevende(rad, kol);
     }
@@ -124,17 +125,16 @@ public class View {
     public void settDoed(int rad, int kol){
         // sett til død
         celleStatus[rad][kol] = false;
-        celleknapper[rad][kol].setText(" ");
-        celleknapper[rad][kol].setBackground(Color.BLACK);
+        cellBtns[rad][kol].setText(" ");
+        cellBtns[rad][kol].setBackground(Color.BLACK);
 
         CTRL.settDoed(rad, kol);
     }
 
     // legger til angitt antall (kall med negative argumenter for å trekke fra)
-    public void settAntLevende(int ant){
-        this.amtLiving = ant;
-        this.amtLivingTxt = String.format("%d ", this.amtLiving);
-        this.amtLabel.setText(amtLivingTxt);
+    public void settAntLevende(int amt){
+        this.amtLabel.setText(String.format("%d", amt));
+
     }
 
     // tilbakestiller spillebrettet (dreper alle celler)
@@ -176,19 +176,19 @@ public class View {
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // oppretter og legger til elementer i menyknapp-panelet
-        this.amtLivingLabel = new JLabel("Alive cells: ");
+        this.amtPreambleLabel = new JLabel("Alive cells: ");
         this.amtLabel = new JLabel(" ");
-        this.amtLivingLabel.setForeground(Color.WHITE);
+        this.amtPreambleLabel.setForeground(Color.WHITE);
         this.startStopBtn = new JButton("Start");
         this.amtLabel.setForeground(Color.WHITE);
-        this.startStopBtn.addActionListener( new StartStopp());
+        this.startStopBtn.addActionListener(new StartStop());
         this.resetBtn = new JButton("Reset");
         this.resetBtn.addActionListener(new Reset());
         this.clearBtn = new JButton("Clear");
         this.clearBtn.addActionListener(new Clear());
         this.exitBtn = new JButton("Exit");
-        this.exitBtn.addActionListener(new Avslutt());
-        this.menuBar.add(this.amtLivingLabel);
+        this.exitBtn.addActionListener(new Exit());
+        this.menuBar.add(this.amtPreambleLabel);
         this.menuBar.add(this.amtLabel);
         this.menuBar.add(this.startStopBtn);
         this.menuBar.add(this.resetBtn);
@@ -196,7 +196,7 @@ public class View {
         this.menuBar.add(this.exitBtn);
         
         // initierer array for celleknapper
-        celleknapper = new JButton[antRad][antKol];
+        cellBtns = new JButton[antRad][antKol];
         celleStatus = new boolean[antRad][antKol];
 
         // legger til elementer i rutenett-panel: løkke for å legge til riktig antall rader og riktig antall knapper per rad (kolonner)
@@ -205,18 +205,16 @@ public class View {
                 JButton celleknapp = new JButton(" ");
                 celleknapp.setPreferredSize(new Dimension(40,40)); // for at det statusikonet på knappen skal ha nok plass
                 celleknapp.setBackground(Color.BLACK);
-                celleknapper[rad][kol] = celleknapp;
+                cellBtns[rad][kol] = celleknapp;
                 
-                celleknapp.addActionListener(new EndreStatus(rad, kol));
+                celleknapp.addActionListener(new FlipStatus(rad, kol));
                 this.grid.add(celleknapp);
             }
         }
         this.CTRL.oppdaterGUI();
 
         // initierer antall levende-label (siden metoden oppdaterGUI påvirker variablene)
-        this.amtLiving = this.CTRL.antLevende();
-        this.amtLivingTxt = String.format("%d", this.amtLiving);
-        this.amtLabel.setText(this.amtLivingTxt);
+        this.amtLabel.setText(String.format("%d", this.CTRL.antLevende()));
 
         // pakker, posisjonerer og synliggjør vinduet
         frame.pack();
