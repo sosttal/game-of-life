@@ -34,28 +34,26 @@ public class View {
 
     JButton[][] cellBtns;
     boolean[][] celleStatus; // for å lagre status på celler (true hvis levende)
-    boolean start = false; // for å holde styr på om start-/stoppknapp skal starte eller stoppe. initieres til false siden programmet ikke skal starte før knapp trykkes en gang
 
     //ActionListeners:
     // start-/stoppknapp: veksler mellom å starte og stoppe programmet og oppdaterer knappetekst
     class StartStop implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            if (!start){ // TODO check (implement) boolean Controller.start()? alt name: Controller.running()
-                start = true;
+            if (!CTRL.running()){
                 // update button text
                 startStopBtn.setText("Stop");
 
                 // sender startsignal til kontroller
-                CTRL.startsignal(true);
-                
+                CTRL.startStop();
+                    
             } else{
-                start = false;
                 // update button text
                 startStopBtn.setText("Start");
 
                 // sender stoppsignal til kontroller
-                CTRL.startsignal(false);
+                CTRL.startStop();
+
             }
         }
     }

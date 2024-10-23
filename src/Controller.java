@@ -8,13 +8,14 @@
 public class Controller {
     // fields
     Model rutenett;
+    View gui;
     int genNr;
     int antRad;
     int antKol;
     long delay;
-    View gui;
+    UpdateThread updateLoop;
 
-    boolean signal;
+    boolean running = false;
 
     // konstruktør
     public Controller(int antRad, int antKol, long delay){
@@ -22,11 +23,11 @@ public class Controller {
         this.antRad = antRad;
         this.antKol = antKol;
         this.delay = delay;
+        this.genNr = 0; // TODO brukes denne til noe? (terminal tror jeg)
         this.rutenett = new Model(antRad, antKol);
-        this.genNr = 0;
-        gui = new View();
+        this.gui = new View();
         
-        // genererer 0te generasjon med celler og kobler dem sammen
+        // generates 0th gen and 
         this.rutenett.fyllMedTilfeldigeCeller();
         this.rutenett.kobleAlleCeller();
     }
@@ -66,14 +67,14 @@ public class Controller {
         rutenett.settDoed(rad, kol);
     }
 
-    // TODO:(test/implement) metode for å generere ny førstegen(0te)
+    // method to regenerate 0th gen
     public void regenererCeller(){
         this.rutenett.fyllMedTilfeldigeCeller();
         this.rutenett.kobleAlleCeller();
         this.oppdaterGUI();
     }
 
-    // metode for å oppdatere rutenett
+    // metode for å oppdatere rutenett TODO make more efficient?
     public void oppdatering(){
         // løkke for å oppdatere antall levende naboer
         for (int rad = 0; rad < this.antRad; rad++){ // itererer over alle rader
@@ -104,6 +105,10 @@ public class Controller {
         this.gui.init(this, antRad, antKol);
     }
 
+    public void settings(){ // dimensions of grid, update frequency , ...?
+        // TODO implement settings prompt
+    }
+
     // henter antall levende
     public int antLevende(){
         return this.rutenett.antallLevende();
@@ -111,22 +116,28 @@ public class Controller {
 
     // metode som tar imot signal fra start- / stoppknapp
     public void startsignal(boolean signal){
-        this.signal = signal;
+        this.running = signal;
         return;
     }
 
-    // metode for å avgjøre når oppdaterings-løkke skal starte
-    public void sjekkStart(){
+    public boolean running(){
+        return this.running;
 
-        // oppdaterings-løkke
-        while (signal){
-            this.oppdatering();
-            try{
-                Thread.sleep(this.delay);
-            } catch(Exception e){
-                return;
-            }
+    }
+
+    // metode for å avgjøre når oppdaterings-løkke skal starte TODO: remove
+    public void startStop(){
+        if (this.running){
+            this.updateLoop.interrupt();
+
+            this.running = false;
+        } else{
+            this.updateLoop = new UpdateThread(this.delay, this);
+            this.updateLoop.start();
+
+            this.running = true;
         }
+        
     }
 
     public void killAll(){

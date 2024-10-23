@@ -14,6 +14,17 @@ public class UpdateThread extends Thread {
 
     @Override
     public void run(){
-        // TODO: do update loop here
+        while (CTRL.running()){
+            CTRL.oppdatering();
+
+            try{
+                Thread.sleep(this.DELAY);
+
+            } catch(InterruptedException e){
+                return;
+
+            }
+
+        }
     }
 }
