@@ -163,6 +163,7 @@ public class View {
         this.menuBar = new JPanel(); // panel for "meny"-knapper
         this.menuBar.setBackground(Color.BLACK); // bg of menubar set to black
         this.grid = new JPanel(); // panel for rutenett
+        this.grid.setBackground(Color.BLACK);
 
         // setter layout på rutenett-panelet
         this.grid.setLayout(new GridLayout(antRad,antKol)); // setter layout på rutenett-panel til verdier angitt av parametre
