@@ -6,7 +6,8 @@ Game of Life simulation in Java visualized with Swing
 - [ ] fix update loop (move wait from main thread)
 - [ ] implement more user options
   - [ ] custom size
-  - [ ] add repopulate button (generate new 1st/0th gen)
-  - more?
+  - [X] add repopulate button (generate new 1st/0th gen)
+    - [ ] (bonus objective) rename from "Reset" to "Regen"?
+  - [X] add clear button (kills all living cells)
 - [ ] more???
 - [ ] edit styling(??)
