@@ -21,12 +21,12 @@ public class Cell {
     }
 
     // metode for å sette cellestatus til død
-    public void settDoed(){
+    public void setDead(){
         this.levende = false;
     }
 
     // metode for å sette cellestatus til levende
-    public void settLevende(){
+    public void setAlive(){
         this.levende = true;
     }
 
