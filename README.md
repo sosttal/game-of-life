@@ -4,6 +4,10 @@ Game of Life simulation in Java visualized with Swing
 ## TODO:
 - [ ] better documentation
 - [ ] complete translation
+  - [ ] Main.java
+  - [x] ~~Controller.java~~
+  - [ ] Model.java
+  - [ ] View.java
 - [ ] in general: more thread optimization?
 - [x] ~~fix update loop (move wait from main thread)~~
 - [x] ~~fix update loop pt2 (more thread optimization?)~~
