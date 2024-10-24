@@ -15,7 +15,7 @@ public class UpdateThread extends Thread {
     @Override
     public void run(){
         while (CTRL.running()){
-            CTRL.oppdatering();
+            CTRL.update();
 
             try{
                 Thread.sleep(this.DELAY);

@@ -9,152 +9,199 @@ import java.util.concurrent.CountDownLatch;
  */
 public class Controller {
     // fields
-    Model rutenett;
-    View gui;
-    int genNr;
-    int antRad;
-    int antKol;
-    long delay;
-    UpdateThread updateLoop;
-    CountDownLatch rowCount;
+    Model game;                 // game-simulation
+    View gui;                   // GUI
+    int genNum;                 // generation number
+    int rowCount;               // number of rows
+    int colCount;               // number of columns
+    long delay;                 // delay for update-loop
+    UpdateThread updateLoop;    // update-loop thread
+    CountDownLatch rowLock;     // lock for threads working on rows (sync barrier)
 
     boolean running = false;
 
-    // konstruktør
-    public Controller(int antRad, int antKol, long delay){
-        // initierer instansvariabler
-        this.antRad = antRad;
-        this.antKol = antKol;
+    /**
+     * 
+     * @param rowCount
+     * @param colCount
+     * @param delay
+     */
+    public Controller(int rowCount, int colCount, long delay){
+        // init vars
+        this.rowCount = rowCount;
+        this.colCount = colCount;
         this.delay = delay;
-        this.genNr = 0; // TODO brukes denne til noe? (terminal tror jeg)
-        this.rutenett = new Model(antRad, antKol);
+        this.genNum = 0; // TODO brukes denne til noe? (terminal tror jeg)
+        this.game = new Model(rowCount, colCount);
         this.gui = new View();
         
-        // generates 0th gen and 
-        this.rutenett.fyllMedTilfeldigeCeller();
-        this.rutenett.kobleAlleCeller();
+        // generates 0th gen and connects cells
+        this.game.randomStartGrid();
+        this.game.connectCells();
     }
 
-    // metode for å tegne rutenettet : for konsollgrensesnitt
-    public void tegn(){
-        this.rutenett.tegnRutenett();
+    /**
+     * Method to draw the game-grid in terminal.
+     */
+    public void terminalDraw(){
+        this.game.tegnRutenett();
 
-        // skriver ut genNr
-        System.out.println("Generasjon: " + this.genNr);
+        // prints gen number
+        System.out.println("Generation: " + this.genNum);
     }
 
-    // går gjennom alle celler og overfører statusen til gui
-    public void oppdaterGUI(){
-        for (int rad = 0; rad < this.antRad; rad++){ // itererer over alle rader
-            for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
-                // gui-rutenett oppdateres i henhold til celles status
-                if (this.rutenett.hentCelle(rad, kol).erLevende()){ // hvis levende
-                    gui.settLevende(rad,kol);
+    /**
+     * Method to update GUI:
+     * 
+     * <p> Iterates through cells and updates their status.
+     */
+    public void updateGUI(){
+        this.rowLock = new CountDownLatch(rowCount); // init rowlock
 
-                } else{ // hvis død (ikke-levende)
-                    gui.settDoed(rad, kol);
+        for (int row = 0; row < this.rowCount; row++){
+            int r = row; // to enable use in lambda expression
 
-                }
-            }
-        }
-
-        gui.settAntLevende(this.antLevende());
-    }
-
-    // bytter status på angitt celle
-    public void settLevende(int rad, int kol){
-        rutenett.settLevende(rad, kol);
-    }
-
-    public void settDoed(int rad, int kol){
-        rutenett.settDoed(rad, kol);
-    }
-
-    // method to regenerate 0th gen
-    public void regenererCeller(){
-        this.rutenett.fyllMedTilfeldigeCeller();
-        this.rutenett.kobleAlleCeller();
-        this.oppdaterGUI();
-    }
-
-    // metode for å oppdatere rutenett
-    public void oppdatering(){
-        this.rowCount = new CountDownLatch(antRad);
-        
-        // løkke for å oppdatere antall levende naboer
-        for (int rad = 0; rad < this.antRad; rad++){ // itererer over alle rader
-            int r = rad;
-            
-            Thread t = new Thread(() -> {
-                for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
-                    // henter celle fra gjeldende posisjon
-                    Cell celle = this.rutenett.hentCelle(r, kol);
+            Thread guiUpdater = new Thread(() -> {
+                for (int col = 0; col < this.colCount; col++){
+                    if (this.game.getCell(r, col).isAlive()){ // gui-grid is updated according to a given cell's status
+                        gui.setAlive(r, col);
     
-                    celle.tellLevendeNaboer();
+                    } else{
+                        gui.setDead(r, col);
+    
+                    }
+                    this.rowLock.countDown();
+
                 }
-                rowCount.countDown();
 
             });
+            guiUpdater.start();
 
-            t.start();
-        }
-
-        try{ rowCount.await(); } catch(InterruptedException e){}
-
-        this.rowCount = new CountDownLatch(antRad);
-
-        // løkke for å oppdatere status
-        for (int rad = 0; rad < this.antRad; rad++){ // itererer over alle rader
-            int r = rad;
-
-            Thread t = new Thread(() -> {
-                for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
-                    // henter celle fra gjeldende posisjon
-                    Cell celle = this.rutenett.hentCelle(r, kol);
-
-                    celle.oppdaterStatus();
-                }
-                rowCount.countDown();
-
-            });
-
-            t.start();
         }
         
-        try{ rowCount.await(); } catch(InterruptedException e){}
+        try{ this.rowLock.await(); } catch(InterruptedException e){} // wait for guiUpdater threads to finish
 
-        // inkrementerer generasjonsnummer
-        this.genNr++;
-
-        this.oppdaterGUI();
+        gui.setLivingCount(this.livingCount());
     }
 
-    // metode for å initiere/starte GUI
+    /**
+     * Method to set cell in given position to alive in the game-simulation.
+     * 
+     * @param row - row of cell
+     * @param col - column of cell
+     */
+    public void setAlive(int row, int col){
+        this.game.setAlive(row, col);
+    }
+    
+    /**
+     * Method to set cell in given position to dead in the game-simulation.
+     * 
+     * @param row - row of cell
+     * @param col - column of cell
+     */
+    public void setDead(int row, int col){
+        this.game.setDead(row, col);
+    }
+
+    /**
+     * Method to regenerate 0th cell-generation
+     */
+    public void regenCells(){
+        this.game.randomStartGrid();
+        this.game.connectCells();
+        this.updateGUI();
+    }
+
+    /**
+     * Method for full update (simulation and gui).
+     */
+    public void update(){
+        this.rowLock = new CountDownLatch(rowCount); // init rowlock
+        
+        // loop to recount each cells number of living neighbours (to determine status after update)
+        for (int row = 0; row < this.rowCount; row++){
+            int r = row; // to enable use in lambda expression
+            
+            Thread neighbourChecker = new Thread(() -> {
+                for (int col = 0; col < this.colCount; col++){
+                    Cell celle = this.game.getCell(r, col); // get cell from current position
+                    
+                    celle.countNeighbours(); // perform recount
+
+                }
+                this.rowLock.countDown();
+
+            });
+            neighbourChecker.start();
+
+        }
+
+        try{ this.rowLock.await(); } catch(InterruptedException e){} // wait for neighbourChecker threads to finish
+
+        this.rowLock = new CountDownLatch(rowCount); // reinit rowlock
+
+        // loop to set new status of each cell
+        for (int row = 0; row < this.rowCount; row++){
+            int r = row; // to enable use in lambda expression
+
+            Thread statusUpdater = new Thread(() -> {
+                for (int col = 0; col < this.colCount; col++){
+                    Cell cell = this.game.getCell(r, col); // get cell from current position
+
+                    cell.updateStatus();
+
+                }
+                this.rowLock.countDown();
+
+            });
+            statusUpdater.start();
+
+        }
+        
+        try{ this.rowLock.await(); } catch(InterruptedException e){} // wait for statusUpdater threads to finish
+
+        this.genNum++;
+
+        this.updateGUI();
+    }
+
+    /**
+     * Wrapper-method to initialize GUI.
+     */
     public void init(){
-        this.gui.init(this, antRad, antKol);
+        this.gui.init(this, rowCount, colCount);
     }
 
+    /**
+     * Method to set user setting.
+     */
     public void settings(){ // dimensions of grid, update freq , ...?
         // TODO implement settings prompt
     }
 
-    // henter antall levende
-    public int antLevende(){
-        return this.rutenett.antallLevende();
+    /**
+     * Method to retrieve living-count from simulation.
+     * 
+     * @return - number of living cells
+     */
+    public int livingCount(){
+        return this.game.livingCount();
     }
 
-    // metode som tar imot signal fra start- / stoppknapp
-    public void startsignal(boolean signal){
-        this.running = signal;
-        return;
-    }
-
+    /**
+     * Method to check if update-loop is running.
+     * 
+     * @return - true if update-loop is running, otherwise false
+     */
     public boolean running(){
         return this.running;
 
     }
 
-    // metode for å avgjøre når oppdaterings-løkke skal starte TODO: remove
+    /**
+     * Method to start/stop update-loop (see {@link #UpdateThread}).
+     */
     public void startStop(){
         if (this.running){
             this.updateLoop.interrupt();
@@ -169,10 +216,13 @@ public class Controller {
         
     }
 
-    public void killAll(){
-        for (int rad = 0; rad < this.antRad; rad++){ // itererer over alle rader
-            for (int kol = 0; kol < this.antKol; kol++){ // itererer over alle kolonner
-                this.rutenett.settDoed(rad, kol);
+    /**
+     * Method to kill all cells (clear the game-grid).
+     */
+    public void killAll(){ // TODO optimize with threads?
+        for (int row = 0; row < this.rowCount; row++){
+            for (int col = 0; col < this.colCount; col++){
+                this.game.setDead(row, col);
             }
         }
     }

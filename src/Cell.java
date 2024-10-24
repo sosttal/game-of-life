@@ -31,13 +31,13 @@ public class Cell {
     }
 
     // metode for å sjekke cellestatus
-    public boolean erLevende(){
+    public boolean isAlive(){
         return this.levende;
     }
 
     // metode for å hente statustegn
     public char hentStatusTegn(){
-        if (this.erLevende()){
+        if (this.isAlive()){
             return 'O';
         } 
         else {
@@ -54,21 +54,21 @@ public class Cell {
     }
 
     // metode for å telle antall levende naboer
-    public void tellLevendeNaboer(){
+    public void countNeighbours(){
         // tilbakestiller antLevendeNaboer før telling
         this.antLevendeNaboer = 0;
         //  itererer over indekser på naboer-arr - for hver nabo, teller nabo hvis den ikke er null og er levende
         for (int  i = 0; i < this.naboer.length; i++){
-            if (this.naboer[i] != null && this.naboer[i].erLevende()){
+            if (this.naboer[i] != null && this.naboer[i].isAlive()){
                 this.antLevendeNaboer ++;
             }
         }
     }
 
     // metode for å oppdatere status basert på ant levende naboer
-    public void oppdaterStatus(){
+    public void updateStatus(){
         // sjekker først om celle er levende (eller død)
-        if (this.erLevende()){
+        if (this.isAlive()){
             if (this.antLevendeNaboer < 2 || this.antLevendeNaboer > 3){ // færre enn to (underpop) / flere enn tre (overpop) naboer -> celle dør
                 this.levende = false;
             }

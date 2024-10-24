@@ -24,14 +24,15 @@ public class View {
     //  menubar elements
     //      lables:
     JLabel aliveCells;    // "Alive cells: "
-    JLabel amtLabel;            // for living counter
+    JLabel amtLabel;      // for living counter
 
     //      buttons:
     JButton startStopBtn;   // to start/stop update loop
-    JButton exitBtn;        // to exit program
     JButton regenBtn;       // to reset game-grid (new 0th generation)
     JButton clearBtn;       // to clear game-grid (sets all cells to dead)
+    JButton exitBtn;        // to exit program
 
+    //  game-grid:
     JButton[][] cellBtns;
     boolean[][] celleStatus; // for å lagre status på celler (true hvis levende)
 
@@ -82,12 +83,16 @@ public class View {
         public void actionPerformed(ActionEvent e){
             // sjekker status og kaller relevant metode
             if (!celleStatus[row][col]){
-                settLevende(row,col);
+                setAlive(row,col);
+                CTRL.setAlive(row, col);
+
             } else{
-                settDoed(row,col);
+                setDead(row,col);
+                CTRL.setDead(row, col);
+
             }
             // oppdaterer gui
-            CTRL.oppdaterGUI();
+            CTRL.updateGUI();
         }
     }
 
@@ -96,7 +101,7 @@ public class View {
         @Override
         public void actionPerformed(ActionEvent e){
             // clear();
-            CTRL.regenererCeller();
+            CTRL.regenCells();
         }
     }
 
@@ -109,28 +114,27 @@ public class View {
     }
     
     // metode for å endre status på angitt celle til levende og oppdatere statussymbol på knapp
-    public void settLevende(int rad, int kol){
+    public void setAlive(int row, int col){
         // sett til levende
-        CTRL.settLevende(rad, kol);
-        celleStatus[rad][kol] = true;
-        cellBtns[rad][kol].setText("*");
-        cellBtns[rad][kol].setBackground(Color.GREEN);
+        celleStatus[row][col] = true;
+        cellBtns[row][col].setText("*");
+        cellBtns[row][col].setBackground(Color.GREEN);
         
-        CTRL.settLevende(rad, kol);
+        //CTRL.setAlive(row, col); //TODO not needed?
     }
 
     // metode for å endre status på angitt celle til død og oppdatere statussymbol på knapp
-    public void settDoed(int rad, int kol){
+    public void setDead(int row, int col){
         // sett til død
-        celleStatus[rad][kol] = false;
-        cellBtns[rad][kol].setText(" ");
-        cellBtns[rad][kol].setBackground(Color.BLACK);
+        celleStatus[row][col] = false;
+        cellBtns[row][col].setText(" ");
+        cellBtns[row][col].setBackground(Color.BLACK);
 
-        CTRL.settDoed(rad, kol);
+        //CTRL.setDead(row, col); //TODO not needed?
     }
 
     // legger til angitt antall (kall med negative argumenter for å trekke fra)
-    public void settAntLevende(int amt){
+    public void setLivingCount(int amt){
         this.amtLabel.setText(String.format("%d", amt));
 
     }
@@ -138,18 +142,23 @@ public class View {
     // tilbakestiller spillebrettet (dreper alle celler)
     public void clear(){
         this.CTRL.killAll();
-        this.CTRL.oppdaterGUI();
+        this.CTRL.updateGUI();
     }
 
-    // to init gui
-    public void init(Controller controller, int antRad, int antKol){
-        // lagrer angitt Kontroller-objekt
+    /**
+     * 
+     * @param controller - the controller object to be used
+     * @param rowCount
+     * @param colCount
+     */
+    public void init(Controller controller, int rowCount, int colCount){
         this.CTRL = controller;
 
-        // oppretter vindu
+        // init frame
         this.frame = new JFrame("Game of Life");
-        this.frame.setPreferredSize(new Dimension(500,500));
-        this.frame.setBackground(Color.BLACK);
+        this.frame.setIconImage(new ImageIcon("img/icon.png").getImage()); // TODO: make/find fitting icon
+        this.frame.setPreferredSize(new Dimension(750,750));
+        this.frame.setForeground(Color.BLACK);
 
         // oppretter hovedpanel (for å holde de andre panelene) og legger det til i vinduet
         this.mainPanel = new JPanel();
@@ -158,13 +167,13 @@ public class View {
         this.frame.add(this.mainPanel);
         
         // oppretter underpaneler
-        this.menuBar = new JPanel(); // panel for "meny"-knapper
-        this.menuBar.setBackground(Color.BLACK); // bg of menubar set to black
+        this.menuBar = new JPanel(); // panel for meny-knapper
+        this.menuBar.setBackground(Color.DARK_GRAY); // bg of menubar set to dark grey
         this.grid = new JPanel(); // panel for rutenett
         this.grid.setBackground(Color.BLACK);
 
         // setter layout på rutenett-panelet
-        this.grid.setLayout(new GridLayout(antRad,antKol)); // setter layout på rutenett-panel til verdier angitt av parametre
+        this.grid.setLayout(new GridLayout(rowCount,colCount)); // setter layout på rutenett-panel til verdier angitt av parametre
 
         // legger til og posisjonerer underpaneler i hovedpanel
         this.mainPanel.add(this.menuBar, BorderLayout.NORTH);
@@ -173,12 +182,14 @@ public class View {
         // sørger for at klikk på x avslutter programmet
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        // oppretter og legger til elementer i menyknapp-panelet
-        this.aliveCells = new JLabel("Alive cells: "); 
+        // init menu-components
+        this.aliveCells = new JLabel("Alive cells: ");
+        this.aliveCells.setFont(new Font("Monospaced", Font.BOLD, 16)); 
         this.amtLabel = new JLabel();
+        this.amtLabel.setFont(new Font("Monospaced", Font.BOLD, 16)); 
         this.aliveCells.setForeground(Color.WHITE);
-        this.startStopBtn = new JButton("Start");
         this.amtLabel.setForeground(Color.WHITE);
+        this.startStopBtn = new JButton("Start");
         this.startStopBtn.addActionListener(new StartStop());
         this.regenBtn = new JButton("Regen");
         this.regenBtn.addActionListener(new Regen());
@@ -186,21 +197,32 @@ public class View {
         this.clearBtn.addActionListener(new Clear());
         this.exitBtn = new JButton("Exit");
         this.exitBtn.addActionListener(new Exit());
+        
+        // add menu-components to menubar
         this.menuBar.add(this.aliveCells);
         this.menuBar.add(this.amtLabel);
-        this.menuBar.add(this.startStopBtn);
-        this.menuBar.add(this.regenBtn);
-        this.menuBar.add(this.clearBtn);
-        this.menuBar.add(this.exitBtn);
+
+        // menu-buttons styled and added to menubar
+        JButton[] menuBtns = {startStopBtn, regenBtn, clearBtn, exitBtn};
+        for (JButton b : menuBtns){
+            b.setForeground(Color.BLACK);
+            b.setBackground(Color.WHITE);
+            b.setFont(new Font("Monospaced", Font.BOLD, 16)); //TODO edit font?
+            b.setBorderPainted(false);
+            // b.setFocusPainted(false);
+            this.menuBar.add(b);
+        }
         
         // initierer array for celleknapper
-        cellBtns = new JButton[antRad][antKol];
-        celleStatus = new boolean[antRad][antKol];
+        cellBtns = new JButton[rowCount][colCount];
+        celleStatus = new boolean[rowCount][colCount];
 
         // legger til elementer i rutenett-panel: løkke for å legge til riktig antall rader og riktig antall knapper per rad (kolonner)
-        for (int rad = 0; rad < antRad; rad++){
-            for (int kol = 0; kol < antKol; kol++){
+        for (int rad = 0; rad < rowCount; rad++){
+            for (int kol = 0; kol < colCount; kol++){
                 JButton celleknapp = new JButton(" ");
+                celleknapp.setFocusPainted(false);
+                celleknapp.setBorderPainted(false); // TODO: what looks: best borders vs no borders?
                 celleknapp.setPreferredSize(new Dimension(40,40)); // for at det statusikonet på knappen skal ha nok plass
                 celleknapp.setBackground(Color.BLACK);
                 cellBtns[rad][kol] = celleknapp;
@@ -209,10 +231,10 @@ public class View {
                 this.grid.add(celleknapp);
             }
         }
-        this.CTRL.oppdaterGUI();
+        this.CTRL.updateGUI();
 
         // initierer antall levende-label (siden metoden oppdaterGUI påvirker variablene)
-        this.amtLabel.setText(String.format("%d", this.CTRL.antLevende()));
+        this.amtLabel.setText(String.format("%d", this.CTRL.livingCount()));
 
         // pakker, posisjonerer og synliggjør vinduet
         frame.pack();

@@ -30,7 +30,7 @@ public class Model {
     }
 
     // metode for å generere 0te gen av celler (tilfeldige celler)
-    public void fyllMedTilfeldigeCeller(){
+    public void randomStartGrid(){
         // itererer over alle radindekser
         for (int rad = 0; rad < this.antRader; rad++){
             // itererer over alle kolonneindekser
@@ -41,7 +41,7 @@ public class Model {
     }
 
     // motode for å hente celle, returnerer Celle-objekt på angitt posisjon eller null
-    public Cell hentCelle(int rad, int kol){
+    public Cell getCell(int rad, int kol){
         if (rad < this.antRader && rad >= 0 && kol < this.antKolonner && kol >= 0){ // sjekker om angitt posisjon er gyldig indeks i rutenettet - returnerer objektet som ligger der
             return rutene[rad][kol];
         }
@@ -70,12 +70,12 @@ public class Model {
 
     // metode for å oppdatere naboer for angitt celle
     public void settNaboer(int rad, int kol){
-        if (this.hentCelle(rad, kol) != null){
+        if (this.getCell(rad, kol) != null){
             int forrigeRad = rad-1;
             int nesteRad = rad+1;
 
             for (int i = -1; i <= 1; i++){ // løkke for naboer på rad-1
-                Cell nabo = this.hentCelle(forrigeRad,kol+i);
+                Cell nabo = this.getCell(forrigeRad,kol+i);
                 if (nabo != null){
                     rutene[rad][kol].leggTilNabo(nabo);
                 }
@@ -83,14 +83,14 @@ public class Model {
         
 
             for (int i = -1; i <= 1; i+=2){ // løkke for naboer på samme rad (hopper over den aktuelle cellens egen indeks)
-                Cell nabo = this.hentCelle(rad,kol+i);
+                Cell nabo = this.getCell(rad,kol+i);
                 if (nabo != null){
                     rutene[rad][kol].leggTilNabo(nabo);
                 }
             }
 
             for (int i = -1; i <= 1; i++){ // løkke for naboer på rad+1
-                Cell nabo = this.hentCelle(nesteRad,kol+i);
+                Cell nabo = this.getCell(nesteRad,kol+i);
                 if (nabo != null){
                     rutene[rad][kol].leggTilNabo(nabo);
                 }
@@ -100,7 +100,7 @@ public class Model {
     }
 
     // metode for å koble sammen celler
-    public void kobleAlleCeller(){
+    public void connectCells(){
         // itererer over alle rader
         for (int rad = 0; rad < this.antRader; rad++){
             // itererer over alle kolonner
@@ -112,13 +112,13 @@ public class Model {
     }
 
     // metode for å telle totalt antall levende celler
-    public int antallLevende(){
+    public int livingCount(){
         int antall = 0;
         // itererer over alle rader
         for (int rad = 0; rad < this.antRader; rad++){
             // itererer over alle kolonner
             for (int kol = 0; kol < this.antKolonner; kol++){
-                if (rutene[rad][kol].erLevende()){ // hvis gjeldende celle lever -> inkrementerer teller
+                if (rutene[rad][kol].isAlive()){ // hvis gjeldende celle lever -> inkrementerer teller
                     antall++;
                 }
             }
@@ -127,12 +127,12 @@ public class Model {
     }
 
     // setter angitt celle til levende
-    public void settLevende(int rad, int kol){
+    public void setAlive(int rad, int kol){
         this.rutene[rad][kol].settLevende();
     }
     
     // setter angitt celle til død
-    public void settDoed(int rad, int kol){
+    public void setDead(int rad, int kol){
         this.rutene[rad][kol].settDoed();
     }
 }
