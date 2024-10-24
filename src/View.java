@@ -2,6 +2,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * GoLGUI:
@@ -12,6 +13,7 @@ import javax.swing.*;
 public class View {
     // fields
     Controller CTRL;
+    CountDownLatch rowLock;
     
     // frame
     JFrame frame;
@@ -251,19 +253,32 @@ public class View {
         cellBtns = new JButton[rowCount][colCount];
         cellStatus = new boolean[rowCount][colCount];
 
+        this.rowLock = new CountDownLatch(rowCount);
+
         // legger til elementer i rutenett-panel: løkke for å legge til riktig antall rader og riktig antall knapper per rad (kolonner) // TODO optimize with threading
         for (int row = 0; row < rowCount; row++){
-            for (int col = 0; col < colCount; col++){
-                JButton cellBtn = new JButton();
-                cellBtn.setFocusPainted(false);
-                cellBtn.setBorderPainted(false);
-                cellBtn.setBackground(Color.BLACK);
-                cellBtns[row][col] = cellBtn;
-                
-                cellBtn.addActionListener(new FlipStatus(row, col));
-                this.grid.add(cellBtn);
-            }
+            int r = row;
+
+            Thread gridBuilder = new Thread(() -> {
+                for (int col = 0; col < colCount; col++){
+                    JButton cellBtn = new JButton();
+                    cellBtn.setFocusPainted(false);
+                    cellBtn.setBorderPainted(false);
+                    cellBtn.setBackground(Color.BLACK);
+                    cellBtns[r][col] = cellBtn;
+                    
+                    cellBtn.addActionListener(new FlipStatus(r, col));
+                    this.grid.add(cellBtn);
+                }
+                this.rowLock.countDown();
+
+            });
+            gridBuilder.start();
+
         }
+
+        try { this.rowLock.await(); } catch(InterruptedException e) {}
+        
         this.CTRL.updateGUI();
 
         // init amount-living counter
