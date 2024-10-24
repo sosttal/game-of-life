@@ -9,10 +9,13 @@ Game of Life simulation in Java visualized with Swing
   - [ ] Model.java
   - [ ] View.java
 - [ ] in general: more thread optimization?
+  - [ ] thread optimization in Model
+  - [ ] thread optimization in View
 - [x] ~~fix update loop (move wait from main thread)~~
 - [x] ~~fix update loop pt2 (more thread optimization?)~~
 - [ ] implement more user options
   - [ ] custom size
+  - [ ] fullscreen button
   - [x] ~~add repopulate button (generate new 1st/0th gen)~~
     - [x] ~~(bonus objective) rename from "Reset" to "Regen"?~~
   - [x] ~~add clear button (kills all living cells)~~
