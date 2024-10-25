@@ -84,12 +84,12 @@ public class Model {
             System.out.println();
         }
         
-        for (int rad = 0; rad < this.rowCount; rad++){
-            for (int kol = 0; kol < this.colCount; kol++){
+        for (int row = 0; row < this.rowCount; row++){
+            for (int col = 0; col < this.colCount; col++){
                 // henter statustegn
-                char statusTegn = this.grid[rad][kol].hentStatusTegn();
+                char statusSym = this.grid[row][col].getStatusSymbol();
                 // skriver ut tegnet til terminalen
-                System.out.print(statusTegn);
+                System.out.print(statusSym);
             }
             System.out.println();
         }

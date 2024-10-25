@@ -1,9 +1,9 @@
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Kontroller: 
- * Styrer og samkjører spillbrettet (GoLModell) og brukergrensesnitt (GoLGUI)
- * Funksjonalitet for å oppdatere verden til neste generasjon, dvs endre status på alle celler i henhold til spillregler
+ * Controller for Game of Life: 
+ * 
+ * <p> Controls and connects game simulation ({@link #Model}) and GUI ({@link #View}).
  * 
  * @author Sondre S Talleraas
  */
@@ -16,7 +16,7 @@ public class Controller {
     int colCount;               // number of columns
     long delay;                 // delay for update-loop
     UpdateThread updateLoop;    // update-loop thread
-    CountDownLatch rowLock;     // lock for threads working on rows (sync barrier)
+    CountDownLatch rowLock;     // lock (sync barrier) for threads working on rows
 
     boolean running = false;
 
@@ -31,7 +31,7 @@ public class Controller {
         this.rowCount = rowCount;
         this.colCount = colCount;
         this.delay = delay;
-        this.genNum = 0; // TODO brukes denne til noe? (terminal tror jeg)
+        this.genNum = 0; // TODO implement tracker in View
         this.game = new Model(rowCount, colCount);
         this.gui = new View();
         
@@ -108,6 +108,7 @@ public class Controller {
      * Method to regenerate 0th cell-generation
      */
     public void regenCells(){
+        this.genNum = 0; // reset generation counter
         this.game.randomStartGrid();
         this.game.connectCells();
         this.updateGUI();
