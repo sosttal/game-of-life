@@ -7,7 +7,7 @@ Game of Life simulation in Java visualized with Swing
   - [ ] Main.java
   - [x] ~~Controller.java~~
   - [ ] Model.java
-  - [ ] View.java
+  - [x] ~~View.java~~
 - [ ] in general: more thread optimization?
   - [ ] thread optimization in Model
   - [x] ~~thread optimization in View (init)~~
