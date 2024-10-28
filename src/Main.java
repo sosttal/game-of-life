@@ -1,33 +1,39 @@
 /**
- * TODO docc
- * Hovedprogram:
+ * Initiates Game of Life.
  * 
- * @author Sondre S Talleraas
+ * <p> The game is constructed using the MVC-pattern, and this program handels initializing the controller.
+ * 
+ * @author <a href="https://github.com/sosttal">Sondre S Talleraas</a>
  */
 public class Main {
     public static void main(String[] args){
-        // konstanter for standardinstillinger
+        // default settings for game
         final int ANT_RAD = 15;
         final int ANT_KOL = 15;
         final long DELAY = 2000;
         
         Controller c; // game controller
         
-        if(args.length == 1){ // TODO: this is unnecessary(?)
-            c = new Controller(ANT_RAD, ANT_KOL, Long.parseLong(args[0])); // hvis kun ett arg sendes ved kjøring settes oppdateringsfrekvensen (i ms) til det
+        // arg handeling (used to determine settings of game)
+        if(args.length == 1){
+            // one arg is interpreted as update-frequency
+            c = new Controller(ANT_RAD, ANT_KOL, Long.parseLong(args[0]));
 
         } else if(args.length == 2){
-            c = new Controller(Integer.parseInt(args[0]), Integer.parseInt(args[1]), DELAY); // hvis to arg tolkes de som dimensjoner
+            // two args interpreted as dimensions of game-grid (rows x columns)
+            c = new Controller(Integer.parseInt(args[0]), Integer.parseInt(args[1]), DELAY); 
 
         } else if(args.length == 3){
-            c = new Controller(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Long.parseLong(args[2])); // hvis tre eller flere arg tolkes de tre første som antRad, antKol og delay, resten ignoreres
+            // three args interpreted as rows, columns and update-freq
+            c = new Controller(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Long.parseLong(args[2])); 
 
         } else{
+            // if 0 or > 3 args default settings are used
             c = new Controller(ANT_RAD, ANT_KOL, DELAY);
 
         }
 
-        // init game
+        // init game-controller
         c.init();     
         
     }

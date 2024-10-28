@@ -5,7 +5,7 @@ import java.util.concurrent.CountDownLatch;
  * 
  * <p> Controls and connects game simulation ({@link #Model}) and GUI ({@link #View}).
  * 
- * @author Sondre S Talleraas
+ * @author <a href="https://github.com/sosttal">Sondre S Talleraas</a>
  */
 public class Controller {
     // fields
@@ -18,7 +18,7 @@ public class Controller {
     UpdateThread updateLoop;    // update-loop thread
     CountDownLatch rowLock;     // lock (sync barrier) for threads working on rows
 
-    boolean running = false;
+    boolean running = false;    // controls the update-loop
 
     /**
      * 
@@ -44,7 +44,7 @@ public class Controller {
      * Method to draw the game-grid in terminal.
      */
     public void terminalDraw(){
-        this.game.tegnRutenett();
+        this.game.drawGrid();
 
         // prints gen number
         System.out.println("Generation: " + this.genNum);

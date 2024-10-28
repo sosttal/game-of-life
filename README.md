@@ -3,11 +3,12 @@ Game of Life simulation in Java visualized with Swing
 
 ## TODO:
 - [ ] better documentation
-- [ ] complete translation
-  - [ ] Main.java
+- [x] ~~complete translation~~
+  - [x] ~~Main.java~~
   - [x] ~~Controller.java~~
-  - [ ] Model.java
-  - [ ] View.java
+  - [x] ~~Model.java~~
+  - [x] ~~View.java~~
+  - [x] ~~Cell.java~~
 - [ ] in general: more thread optimization?
   - [ ] thread optimization in Model
   - [x] ~~thread optimization in View (init)~~

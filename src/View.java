@@ -26,8 +26,8 @@ public class View {
     
     //  menubar elements
     //      stat-lables:
-    JLabel livingCells;    // "Alive cells: "
-    JLabel amtLabel;      // for living counter
+    JLabel livingCells;     // "Alive cells: "
+    JLabel amtLabel;        // living counter
 
     //      buttons:
     JButton startStopBtn;   // to start/stop update loop
@@ -37,7 +37,7 @@ public class View {
 
     //  game-grid:
     JButton[][] cellBtns;
-    boolean[][] cellStatus; // for å lagre status på celler (true hvis levende)
+    boolean[][] cellStatus;
 
     // style related constants
     Font BTN_FONT = new Font("Monospaced", Font.BOLD, 20);                                          // font used for menu buttons
@@ -51,7 +51,7 @@ public class View {
     Dimension STAT_DISPLAY_SIZE = new Dimension(200, 50);                                           // size of stat display
     Dimension FRAME_SIZE = new Dimension(this.FULLSCREEN.height-200,this.FULLSCREEN.height-200);    // default frame size limited by height of screen
 
-    //ActionListeners:
+    // ActionListeners:
     /**
      * Defines behaviour of start/stop button.
      * 
@@ -94,7 +94,7 @@ public class View {
     /**
      * Defines behaviour of cell "buttons".
      * 
-     * <p> Changes status of related cell, and updates gui.
+     * <p> Changes status of related cell, and updates GUI.
      */
     class FlipStatus implements ActionListener{
         // fields
@@ -210,7 +210,7 @@ public class View {
         this.frame.setIconImage(new ImageIcon("img/icon.png").getImage());
         this.frame.setPreferredSize(this.FRAME_SIZE);
         this.frame.setResizable(false);
-        this.frame.setUndecorated(true); // //TODO useful for fullscreen feature
+        this.frame.setUndecorated(true);
         this.frame.setBackground(Color.BLACK);
 
         // init and add main panel to frame
@@ -299,7 +299,7 @@ public class View {
         cellBtns = new JButton[rowCount][colCount];
         cellStatus = new boolean[rowCount][colCount];
         
-        this.rowLock = new CountDownLatch(rowCount); // for parallel
+        this.rowLock = new CountDownLatch(rowCount);
 
         // configures and adds cell-buttons to grid panel
         for (int row = 0; row < rowCount; row++){
@@ -331,7 +331,7 @@ public class View {
         // init amount-living counter
         this.amtLabel.setText(String.format("%d", this.CTRL.livingCount()));
 
-        // pakker, posisjonerer og synliggjør vinduet
+        // packs, positions and displays frame
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
