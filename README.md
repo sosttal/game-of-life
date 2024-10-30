@@ -29,4 +29,4 @@ Game of Life simulation in Java visualized with Swing
 - [x] ~~cell update~~
   - Symptom: cells (seemingly?) not behaving correctly during update (known self-sustainable patterns not working as expected)
   - Cause: seems to be multithreading during grid-building in the gui, causing a discrepancy between grid representations in View and Model 
-  - Fix: remove parallelization during grid-setup in View.init (bug-causing section reverted to fbe21a0dfca18cfa8cd0ec15f861deb0baf28613)
+  - Fix: remove multithreading during grid-building in View.init (bug-causing section reverted to fbe21a0dfca18cfa8cd0ec15f861deb0baf28613)
