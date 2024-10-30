@@ -3,6 +3,7 @@ Game of Life simulation in Java visualized with Swing
 
 ## TODO:
 - [ ] better documentation
+- [ ] BUG: cell update :(
 - [x] ~~complete translation~~
   - [x] ~~Main.java~~
   - [x] ~~Controller.java~~

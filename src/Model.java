@@ -119,7 +119,7 @@ public class Model {
             for (int i = -1; i <= 1; i++){ 
                 Cell neighbour = this.getCell(prvRow,col+i);
                 if (neighbour != null){
-                    grid[row][col].leggTilNabo(neighbour);
+                    grid[row][col].addNeighbour(neighbour);
                 }
             }
         
@@ -127,7 +127,7 @@ public class Model {
             for (int i = -1; i <= 1; i+=2){
                 Cell neighbour = this.getCell(row,col+i);
                 if (neighbour != null){
-                    grid[row][col].leggTilNabo(neighbour);
+                    grid[row][col].addNeighbour(neighbour);
                 }
             }
 
@@ -135,7 +135,7 @@ public class Model {
             for (int i = -1; i <= 1; i++){
                 Cell neighbour = this.getCell(nxtRow,col+i);
                 if (neighbour != null){
-                    grid[row][col].leggTilNabo(neighbour);
+                    grid[row][col].addNeighbour(neighbour);
                 }
             }
             

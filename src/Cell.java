@@ -65,7 +65,7 @@ public class Cell {
      * 
      * @param neighbour - cell to be added as neighbour
      */
-    public void leggTilNabo(Cell neighbour){
+    public void addNeighbour(Cell neighbour){
         this.neighbours[this.neighbourCount] = neighbour;
         this.neighbourCount += 1;
     }
