@@ -299,33 +299,22 @@ public class View {
         cellBtns = new JButton[rowCount][colCount];
         cellStatus = new boolean[rowCount][colCount];
         
-        this.rowLock = new CountDownLatch(rowCount);
+        //this.rowLock = new CountDownLatch(rowCount);
 
         // configures and adds cell-buttons to grid panel
-        for (int row = 0; row < rowCount; row++){
-            int r = row;
-            
-            Thread gridBuilder = new Thread(() -> {
-                for (int col = 0; col < colCount; col++){
-                    JButton cellBtn = new JButton();
-                    cellBtn.setFocusPainted(false);
-                    cellBtn.setBorderPainted(false);
-                    cellBtn.setFocusable(false);
-                    cellBtn.setBackground(Color.BLACK);
-                    cellBtns[r][col] = cellBtn;
-                    
-                    cellBtn.addActionListener(new FlipStatus(r, col));
-                    this.grid.add(cellBtn);
-                }
-                this.rowLock.countDown();
-
-            });
-            gridBuilder.start();
-
+        for (int row = 0; row < rowCount; row++){ // TODO: can stable threading be implemented?
+            for (int col = 0; col < colCount; col++){
+                JButton cellBtn = new JButton();
+                cellBtn.setFocusPainted(false);
+                cellBtn.setBorderPainted(false);
+                cellBtn.setFocusable(false);
+                cellBtn.setBackground(Color.BLACK);
+                cellBtns[row][col] = cellBtn;
+                
+                cellBtn.addActionListener(new FlipStatus(row, col));
+                this.grid.add(cellBtn);
+            }
         }
-
-        try { this.rowLock.await(); } catch(InterruptedException e) {}
-        
         this.CTRL.updateGUI();
 
         // init amount-living counter
