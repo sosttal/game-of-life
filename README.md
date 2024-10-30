@@ -3,7 +3,7 @@ Game of Life simulation in Java visualized with Swing
 
 ## TODO:
 - [ ] better documentation
-- [ ] BUG: cell update :(
+
 - [x] ~~complete translation~~
   - [x] ~~Main.java~~
   - [x] ~~Controller.java~~
@@ -23,3 +23,9 @@ Game of Life simulation in Java visualized with Swing
   - [x] ~~add clear button (kills all living cells)~~
 - [ ] more???
 - [ ] edit styling(??)
+
+## BUGS? [fixed?]
+(fixed if checked)
+- [x] ~~cell update~~
+  - Symptom: cells (seemingly?) not behaving correctly during update (known self-sustainable patterns not working as expected)
+  - Fix: remove parallelization during grid-setup in View.init (bug-causing section reverted to fbe21a0dfca18cfa8cd0ec15f861deb0baf28613)
