@@ -1,5 +1,7 @@
 /**
  * Thread-class to handle the update-loop.
+ * 
+ * @author <a href="https://github.com/sosttal">Sondre S Talleraas</a>
  */
 public class UpdateThread extends Thread {
     // fields

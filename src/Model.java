@@ -105,7 +105,7 @@ public class Model {
     }
 
     /**
-     * Updates neighbours for given cell.
+     * Sets neighbours for given cell.
      * 
      * @param row - row of cell to be updated
      * @param col - column og cell to be updated

@@ -120,15 +120,15 @@ public class Controller {
     public void update(){
         this.rowLock = new CountDownLatch(rowCount); // init rowlock
         
-        // loop to recount each cells number of living neighbours (to determine status after update)
+        // loop to recount each cells number of living neighbours (needed to determine new status)
         for (int row = 0; row < this.rowCount; row++){
             int r = row; // to enable use in lambda expression
             
             Thread neighbourChecker = new Thread(() -> {
                 for (int col = 0; col < this.colCount; col++){
-                    Cell celle = this.game.getCell(r, col); // get cell from current position
+                    Cell cell = this.game.getCell(r, col); // get cell from current position
                     
-                    celle.countNeighbours(); // perform recount
+                    cell.countNeighbours(); // perform recount
 
                 }
                 this.rowLock.countDown();
