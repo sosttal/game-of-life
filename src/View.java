@@ -291,6 +291,7 @@ public class View {
             b.setFont(this.BTN_FONT);
             b.setBorderPainted(true);
             b.setFocusPainted(false);
+            b.addFocusListener(new ButtonFocus(b));
             b.setPreferredSize(this.BTN_SIZE);
             this.buttonBar.add(b);
         }
