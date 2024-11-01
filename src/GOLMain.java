@@ -5,12 +5,12 @@
  * 
  * @author <a href="https://github.com/sosttal">Sondre S Talleraas</a>
  */
-public class Main {
+public class GOLMain {
     public static void main(String[] args){
         // default settings for game
-        final int ANT_RAD = 15;
-        final int ANT_KOL = 15;
-        final long DELAY = 2000;
+        final int ANT_RAD = 36;
+        final int ANT_KOL = 36;
+        final long DELAY = 444;
         
         Controller c; // game controller
         
